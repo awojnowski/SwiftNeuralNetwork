@@ -217,13 +217,12 @@ class Network {
     
     typealias BackpropagateResult = (weightChanges:[[[Double]]], biasChanges: [[Double]])
     private func backpropagate(input: [Double], desiredResult: [Double]) -> BackpropagateResult {
-        
+    
         var biasChanges = self.biases.map { $0.map { _ in 0.0 } }
         var weightChanges = self.weights.map { $0.map { $0.map { _ in 0.0 } } }
         
         // feedforward and collect the activations/z values
         
-        var currentLayerActivations = input
         var activationsList = [input]
         
         for (index, layer) in self.layers.enumerate() {
@@ -239,7 +238,7 @@ class Network {
             
             for neuronIndex in 0..<layer {
                 
-                let z = self.calculateNeuronZ(currentLayerActivations, weights: self.weights[index - 1][neuronIndex], bias: self.biases[index - 1][neuronIndex])
+                let z = self.calculateNeuronZ(activationsList[activationsList.count - 1], weights: self.weights[index - 1][neuronIndex], bias: self.biases[index - 1][neuronIndex])
                 zLayer.append(z)
                 
                 let a = self.calculateNeuronA(z)
@@ -247,7 +246,6 @@ class Network {
                 
             }
             
-            currentLayerActivations = activationsLayer
             activationsList.append(activationsLayer)
             
         }
@@ -380,7 +378,8 @@ print(network.feedforward([4]))
 var trainingData: [Network.InputSample] = []
 for i in 0..<100000 {
     
-    trainingData.append((input: [Double(i % 100)], desiredResult: [0.25, 0.75]))
+    let number = i % 100
+    trainingData.append((input: [Double(number)], desiredResult: [0.25, 0.75]))
     
 }
 network.train(trainingData, stochasticSampleSize: 10, learningRate: 0.5)
