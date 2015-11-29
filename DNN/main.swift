@@ -244,7 +244,6 @@ class Network {
         
         var currentLayerActivations = input
         var activationsList = [input]
-        var zList: [[Double]] = []
         
         for (index, layer) in self.layers.enumerate() {
             
@@ -269,7 +268,6 @@ class Network {
             
             currentLayerActivations = activationsLayer
             activationsList.append(activationsLayer)
-            zList.append(zLayer)
             
         }
         
