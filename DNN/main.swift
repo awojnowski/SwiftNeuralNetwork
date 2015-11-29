@@ -123,7 +123,11 @@ class Network {
             var newValues: [Double] = []
             for neuronIndex in 0..<layer {
                 
-                newValues.append(self.calculateNeuronA(self.calculateNeuronZ(values, weights: self.weights[index - 1][neuronIndex], bias: self.biases[index - 1][neuronIndex])))
+                newValues.append(self.calculateNeuronA(self.calculateNeuronZ(
+                    values,
+                    weights: self.weights[index - 1][neuronIndex],
+                    bias: self.biases[index - 1][neuronIndex]
+                )))
                 
             }
             values = newValues
@@ -136,8 +140,6 @@ class Network {
     
     typealias InputSample = (input: [Double], desiredResult: [Double])
     func train(var input: [InputSample], stochasticSampleSize: Int, learningRate: Double) {
-        
-        // we will be implementing stochastic gradient descent, hence we must shuffle the array and sort it into samples
         
         input.shuffleInPlace()
         
@@ -182,54 +184,33 @@ class Network {
         var weightChanges = self.weights.map { $0.map { $0.map { _ in 0.0 } } }
         
         for (input, desiredResult) in sample {
-            
             let result = self.backpropagate(input, desiredResult: desiredResult)
             for i in 0..<biasChanges.count {
-                
                 for j in 0..<biasChanges[i].count {
-                    
                     biasChanges[i][j] = biasChanges[i][j] + result.biasChanges[i][j]
-                    
                 }
                 
             }
             for i in 0..<weightChanges.count {
-                
                 for j in 0..<weightChanges[i].count {
-                    
                     for k in 0..<weightChanges[i][j].count {
-                        
                         weightChanges[i][j][k] = weightChanges[i][j][k] + result.weightChanges[i][j][k]
-                        
                     }
-                    
                 }
-                
             }
-            
         }
         
         for i in 0..<biasChanges.count {
-            
             for j in 0..<biasChanges[i].count {
-                
-                self.biases[i][j] = self.biases[i][j] - (Double(learningRate) / Double(sample.count)) * biasChanges[i][j]
-                
+                self.biases[i][j] = self.biases[i][j] - Double(learningRate)  * biasChanges[i][j]
             }
-            
         }
         for i in 0..<weightChanges.count {
-            
             for j in 0..<weightChanges[i].count {
-                
                 for k in 0..<weightChanges[i][j].count {
-                    
-                    self.weights[i][j][k] = self.weights[i][j][k] - (Double(learningRate) / Double(sample.count)) * weightChanges[i][j][k]
-                    
+                    self.weights[i][j][k] = self.weights[i][j][k] - Double(learningRate) * weightChanges[i][j][k]
                 }
-                
             }
-            
         }
         
     }
@@ -394,6 +375,8 @@ print(network.feedforward([13]))
 print(network.feedforward([21]))
 print(network.feedforward([97]))
 print(network.feedforward([4]))
+
+
 var trainingData: [Network.InputSample] = []
 for i in 0..<100000 {
     
